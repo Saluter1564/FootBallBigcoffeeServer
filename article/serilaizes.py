@@ -11,31 +11,33 @@
 """
 from rest_framework import serializers
 from django.contrib.auth.models import User, Group
-from .models import Category,Item,Tag,Article,Ad,UserFav
-from rest_framework.validators import UniqueValidator,UniqueTogetherValidator
+from .models import Category, Item, Tag, Article, Ad, UserFav, MatchList
+from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 from rest_framework.compat import authenticate
+
 
 # user序列化类 继承ModelSerializer
 class UserSerializer(serializers.ModelSerializer):
-
     class Meta:
-        #指定模型名称
+        # 指定模型名称
         model = User
-        #指定需要字段，全部用"__all__"
+        # 指定需要字段，全部用"__all__"
         fields = "__all__"
-       # fields = ('url', 'username', 'email', 'groups')
+    # fields = ('url', 'username', 'email', 'groups')
+
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
-        class Meta:
-            model = Group
-            fields = ('url', 'name')
+    class Meta:
+        model = Group
+        fields = ('url', 'name')
 
-#分类
+
+# 分类
 class CategorySerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Category
         fields = "__all__"
+
 
 # 实现新闻类别增加类别下面的栏目数据，采用自定义字段方法实现
 class CategoryitemsSerializer(serializers.ModelSerializer):
@@ -53,6 +55,7 @@ class CategoryitemsSerializer(serializers.ModelSerializer):
             items_serializer = ItemnocateSerializer(items, many=True, context={'request': self.context['request']})
             return items_serializer.data
 
+
 class CategoryStringSerializer(serializers.ModelSerializer):
     # 用__str__方法表示只读关系 items 为外键关系中的related_name
     items = serializers.StringRelatedField(many=True)
@@ -62,6 +65,7 @@ class CategoryStringSerializer(serializers.ModelSerializer):
         # fields = ('id', 'title','items')
         fields = "__all__"
 
+
 class CategoryPrimaryKeySerializer(serializers.ModelSerializer):
     # 用主键表示关系
     items = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
@@ -69,6 +73,7 @@ class CategoryPrimaryKeySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = "__all__"
+
 
 class CategorySlugSerializer(serializers.ModelSerializer):
     # 选取关系对象中任意一个字段（唯一标识）表示关系
@@ -83,8 +88,7 @@ class CategorySlugSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-
-#子栏目
+# 子栏目
 class ItemSerializer(serializers.ModelSerializer):
     # 正向嵌套
     categorys = CategorySerializer()
@@ -93,45 +97,52 @@ class ItemSerializer(serializers.ModelSerializer):
         model = Item
         fields = "__all__"
 
-class ItemnocateSerializer(serializers.ModelSerializer):
 
+class ItemnocateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = "__all__"
 
-#按serializers来序列化
+
+# 按serializers来序列化
 class TagSerializer(serializers.ModelSerializer):
-    #id = serializers.Field()
+    # id = serializers.Field()
     name = serializers.CharField(required=True, max_length=100)
     slug = serializers.CharField(required=True, max_length=100)
+
     class Meta:
         model = Tag
-        fields = ( 'id','name', 'slug')
+        fields = ('id', 'name', 'slug')
+
 
 class AdSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ad
         fields = "__all__"
 
+
 class ArticleSerializer(serializers.ModelSerializer):
-    #外键相关对象
+    # 外键相关对象
     item = ItemSerializer()
     author = UserSerializer()
     tags = TagSerializer(many=True)
+
     class Meta:
         model = Article
         fields = "__all__"
+
 
 class Hot_articleSerializer(serializers.ModelSerializer):
     item = ItemSerializer()
     author = UserSerializer()
     tags = TagSerializer(many=True)
+
     class Meta:
         model = Article
         fields = "__all__"
 
-class ArticlemodelSerializer(serializers.ModelSerializer):
 
+class ArticlemodelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = "__all__"
@@ -142,24 +153,26 @@ class UserDetailSerializer(serializers.ModelSerializer):
     用户详情序列化类
     """
     token = serializers.CharField(required=False, max_length=1024)
+
     class Meta:
         model = User
         fields = "__all__"
 
-class UserRegSerializer(serializers.ModelSerializer):
 
+class UserRegSerializer(serializers.ModelSerializer):
     username = serializers.CharField(label="用户名", help_text="用户名", required=True, allow_blank=False,
                                      validators=[UniqueValidator(queryset=User.objects.all(), message="用户已经存在")])
 
     password = serializers.CharField(
-        style={'input_type': 'password'},help_text="密码", label="密码", write_only=True,
-        )
+        style={'input_type': 'password'}, help_text="密码", label="密码", write_only=True,
+    )
     token = serializers.CharField(required=False, max_length=1024)
-
 
     class Meta:
         model = User
-        fields = ( 'username', 'password', 'token')
+        fields = ('username', 'password', 'token')
+
+
 class UserLoginSerializer(serializers.ModelSerializer):
     """
     用户登录序列化类
@@ -167,13 +180,14 @@ class UserLoginSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True, max_length=100)
     password = serializers.CharField(required=True, max_length=100)
     token = serializers.CharField(required=False, max_length=1024)
+
     # attrs 为封装后的request
     def validate(self, attrs):
         username = attrs.get('username')
         password = attrs.get('password')
 
         if username and password:
-            #用户名称、密码登录验证
+            # 用户名称、密码登录验证
             user = authenticate(request=self.context.get('request'),
                                 username=username, password=password)
             # The authenticate call simply returns None for is_active=False
@@ -194,13 +208,13 @@ class UserLoginSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'password', 'token')
 
-class UserSetPasswordSerializer(serializers.ModelSerializer):
 
+class UserSetPasswordSerializer(serializers.ModelSerializer):
     username = serializers.CharField(label="用户名", help_text="用户名", required=True, allow_blank=False)
 
     password = serializers.CharField(
-        style={'input_type': 'password'},help_text="密码", label="密码", write_only=True,
-        )
+        style={'input_type': 'password'}, help_text="密码", label="密码", write_only=True,
+    )
     newpassword = serializers.CharField(
         style={'input_type': 'password'}, help_text="新密码", label="新密码", write_only=True,
     )
@@ -227,20 +241,22 @@ class UserSetPasswordSerializer(serializers.ModelSerializer):
 
         attrs['user'] = user
         return attrs
+
     class Meta:
         model = User
         fields = ('username', 'password', 'newpassword')
+
 
 class UserFavDetailSerializer(serializers.ModelSerializer):
     articles = ArticleSerializer()
 
     class Meta:
         model = UserFav
-        fields = ('articles','id')
+        fields = ('articles', 'id')
 
 
 class UserFavSerializer(serializers.ModelSerializer):
-    #隐藏字段
+    # 隐藏字段
     user = serializers.HiddenField(
         default=serializers.CurrentUserDefault()
     )
@@ -255,4 +271,11 @@ class UserFavSerializer(serializers.ModelSerializer):
             )
         ]
 
-        fields = ('user', 'articles','id')
+        fields = ('user', 'articles', 'id')
+
+
+class GetMatchListByDateSerializer(serializers.ModelSerializer):
+    # 根据日期获取比赛数据
+    class Meta:
+        model = MatchList
+        fields = "__all__"

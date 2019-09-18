@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = '4bzc)&6b+al=nu^h)s*o_5h8vhc&z)zc%=jlf4@8av+4g6rq*e'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -79,7 +77,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'newsapi.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
@@ -88,11 +85,10 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'newstwo',
         'USER': 'root',
-        'PORT':'3306',
+        'PORT': '3306',
         'PASSWORD': 'Leng9s9bxs',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
@@ -112,36 +108,35 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
-#设置时区
-LANGUAGE_CODE = 'zh-hans'  #中文支持，django1.8以后支持；1.8以前是zh-cn
+# 设置时区
+LANGUAGE_CODE = 'zh-hans'  # 中文支持，django1.8以后支持；1.8以前是zh-cn
 TIME_ZONE = 'Asia/Shanghai'
 USE_I18N = True
 USE_L10N = True
-USE_TZ = False   #默认是Ture，时间是utc时间，由于我们要用本地时间，所用手动修改为false！！！！
+USE_TZ = False  # 默认是Ture，时间是utc时间，由于我们要用本地时间，所用手动修改为false！！！！
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR,  'static').replace('','/')
-STATICFILES_DIRS= ( os.path.join(BASE_DIR,  'static'),)
+STATIC_ROOT = os.path.join(BASE_DIR, 'static').replace('', '/')
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR,  'media').replace('\\','/')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media').replace('\\', '/')
 
-#token rest framework 配置实现
+# token rest framework 配置实现
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         # 'rest_framework.permissions.IsAuthenticated', #必须有
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.BasicAuthentication',
-        #'rest_framework.authentication.TokenAuthentication',#系统已有的
-        #'article.auth.MyTokenAuthentication',#自定义的带过期的认证
+        # 'rest_framework.authentication.TokenAuthentication',#系统已有的
+        # 'article.auth.MyTokenAuthentication',#自定义的带过期的认证
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
@@ -151,7 +146,7 @@ REST_FRAMEWORK = {
     )
 }
 
-#跨域增加忽略
+# 跨域增加忽略
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = (

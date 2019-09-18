@@ -1,8 +1,11 @@
 from rest_framework import viewsets
-from .models import Category,Item,Tag,Article,Ad,UserFav,User
-from .serilaizes import  UserRegSerializer, UserDetailSerializer,UserLoginSerializer,UserSetPasswordSerializer
-from .serilaizes import UserFavSerializer, UserFavDetailSerializer,CategoryStringSerializer,CategoryPrimaryKeySerializer,CategorySlugSerializer
-from .serilaizes import CategorySerializer,ItemSerializer,TagSerializer,AdSerializer,ArticleSerializer,Hot_articleSerializer,CategoryitemsSerializer
+from .models import Category, Item, Tag, Article, Ad, UserFav, User, MatchList
+from .serilaizes import UserRegSerializer, UserDetailSerializer, UserLoginSerializer, UserSetPasswordSerializer
+from .serilaizes import UserFavSerializer, UserFavDetailSerializer, CategoryStringSerializer, \
+    CategoryPrimaryKeySerializer, CategorySlugSerializer
+from .serilaizes import CategorySerializer, ItemSerializer, TagSerializer, AdSerializer, ArticleSerializer, \
+    Hot_articleSerializer, CategoryitemsSerializer
+from .serilaizes import GetMatchListByDateSerializer
 import json
 from rest_framework.decorators import api_view
 from rest_framework import mixins
@@ -14,13 +17,15 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework import permissions
-from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST,HTTP_201_CREATED
+from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_201_CREATED
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from data_request.ttyingqiu_interpretation import ttyingqiu
-#class CategoryViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+
+
+# class CategoryViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
 class CategoryViewset(viewsets.ModelViewSet):
     """
     list:
@@ -40,7 +45,8 @@ class CategoryViewset(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     lookup_field = "id"
 
-#class CategoryitemsViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+
+# class CategoryitemsViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
 class CategoryitemsViewset(viewsets.ReadOnlyModelViewSet):
     """
     list:
@@ -53,6 +59,7 @@ class CategoryitemsViewset(viewsets.ReadOnlyModelViewSet):
     # 序列化的类名
     serializer_class = CategoryitemsSerializer
     lookup_field = "id"
+
 
 class CategoryStringitemsViewset(viewsets.ReadOnlyModelViewSet):
     """
@@ -67,6 +74,7 @@ class CategoryStringitemsViewset(viewsets.ReadOnlyModelViewSet):
     serializer_class = CategoryStringSerializer
     lookup_field = "id"
 
+
 class CategoryPrimaryKeyitemsViewset(viewsets.ReadOnlyModelViewSet):
     """
     list:
@@ -79,6 +87,8 @@ class CategoryPrimaryKeyitemsViewset(viewsets.ReadOnlyModelViewSet):
     # 序列化的类名
     serializer_class = CategoryPrimaryKeySerializer
     lookup_field = "id"
+
+
 class CategorySlugitemsViewset(viewsets.ReadOnlyModelViewSet):
     """
     list:
@@ -92,7 +102,8 @@ class CategorySlugitemsViewset(viewsets.ReadOnlyModelViewSet):
     serializer_class = CategorySlugSerializer
     lookup_field = "id"
 
-#class ItemViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+
+# class ItemViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
 class ItemViewset(viewsets.ModelViewSet):
     """
     list:
@@ -106,20 +117,20 @@ class ItemViewset(viewsets.ModelViewSet):
     delete:
        DELETE url: /item/1/  删除子类详情，返回空对像
     """
-    #用于从此视图返回对象的查询器集。
+    # 用于从此视图返回对象的查询器集。
 
     queryset = Item.objects.all()
 
-
-    #filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
-    #查询
-    #filter_class = ItemFilter
+    # filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
+    # 查询
+    # filter_class = ItemFilter
     # SearchFilter对应search_fields，对应模糊查询,也可用关连表的字段进行查询，但需要二个下划线连接，如categorys__title
-    search_fields = ('title','categorys__title')
-    #用于验证和反序列化输入以及序列化输出的serializer类。通常，您必须设置此属性，或覆盖该get_serializer_class()方法。
+    search_fields = ('title', 'categorys__title')
+    # 用于验证和反序列化输入以及序列化输出的serializer类。通常，您必须设置此属性，或覆盖该get_serializer_class()方法。
     serializer_class = ItemSerializer
     # 应用于执行单个模型实例的对象查找的模型字段。默认为’pk’。
     lookup_field = "id"
+
 
 class TagViewset(viewsets.ModelViewSet):
     """
@@ -134,18 +145,19 @@ class TagViewset(viewsets.ModelViewSet):
     delete:
        DELETE url: /tag/1/  删除标签详情，返回空对像
     """
-    #用于从此视图返回对象的查询器集。
+    # 用于从此视图返回对象的查询器集。
     queryset = Tag.objects.all()
 
-    #filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
-    #查询
-    #filter_class =
+    # filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
+    # 查询
+    # filter_class =
     # SearchFilter对应search_fields，对应模糊查询,也可用关连表的字段进行查询，但需要二个下划线连接，如categorys__title
     search_fields = ('name')
-    #用于验证和反序列化输入以及序列化输出的serializer类。通常，您必须设置此属性，或覆盖该get_serializer_class()方法。
+    # 用于验证和反序列化输入以及序列化输出的serializer类。通常，您必须设置此属性，或覆盖该get_serializer_class()方法。
     serializer_class = TagSerializer
     # 应用于执行单个模型实例的对象查找的模型字段。默认为’pk’。
     lookup_field = "id"
+
 
 class AdViewset(viewsets.ModelViewSet):
     """
@@ -160,18 +172,19 @@ class AdViewset(viewsets.ModelViewSet):
     delete:
        DELETE url: /ad/1/  删除广告详情，返回空对像
     """
-    #用于从此视图返回对象的查询器集。
+    # 用于从此视图返回对象的查询器集。
     queryset = Ad.objects.all()
 
-    #filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
-    #查询
-    #filter_class =
+    # filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
+    # 查询
+    # filter_class =
     # SearchFilter对应search_fields，对应模糊查询,也可用关连表的字段进行查询，但需要二个下划线连接，如categorys__title
     search_fields = ('title')
-    #用于验证和反序列化输入以及序列化输出的serializer类。通常，您必须设置此属性，或覆盖该get_serializer_class()方法。
+    # 用于验证和反序列化输入以及序列化输出的serializer类。通常，您必须设置此属性，或覆盖该get_serializer_class()方法。
     serializer_class = AdSerializer
     # 应用于执行单个模型实例的对象查找的模型字段。默认为’pk’。
     lookup_field = "id"
+
 
 class ArticlePagination(PageNumberPagination):
     page_size = 5
@@ -190,27 +203,28 @@ class ArticleListViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, views
     queryset = Article.objects.all()
     # 序列化的类名
     serializer_class = ArticleSerializer
-    #分页，有分页列表结果时应使用的分页类。
+    # 分页，有分页列表结果时应使用的分页类。
     pagination_class = ArticlePagination
     # authentication_classes = (TokenAuthentication, )
-    #过滤、查询类
+    # 过滤、查询类
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
-    #DjangoFilterBackend对应filter_fields属性，做相等查询
+    # DjangoFilterBackend对应filter_fields属性，做相等查询
     # 过滤字段类
     filter_class = ArticleFilter
-    #SearchFilter对应search_fields，对应模糊查询
-    search_fields = ('title','item__title', 'tags__name')
-    #排序
+    # SearchFilter对应search_fields，对应模糊查询
+    search_fields = ('title', 'item__title', 'tags__name')
+    # 排序
     ordering_fields = ('id', 'publish_date')
     lookup_field = "id"
 
-    #重写retrieve方法，取出数据后，将浏览数加一，重新取回数据
+    # 重写retrieve方法，取出数据后，将浏览数加一，重新取回数据
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.read_num += 1
         instance.save()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
+
 
 class Hot_articleListViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     """
@@ -242,8 +256,9 @@ class UserViewset(viewsets.ModelViewSet):
        DELETE url: /user/1/  删除用户详情
 
     """
-   # queryset = User.objects.all()
-   # serializer_class = UserDetailSerializer
+
+    # queryset = User.objects.all()
+    # serializer_class = UserDetailSerializer
 
     def get_serializer_class(self):
         if self.action == "retrieve":
@@ -252,23 +267,25 @@ class UserViewset(viewsets.ModelViewSet):
             return UserRegSerializer
 
         return UserDetailSerializer
+
     # 认证策略属性
-    authentication_classes = (TokenAuthentication, SessionAuthentication )
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
 
     def get_queryset(self):
-        users=User.objects.filter(id=self.request.user.id)
+        users = User.objects.filter(id=self.request.user.id)
         if users:
             for user in users:
                 issuperuser = user.is_superuser
             if issuperuser:
                 queryset = User.objects.all()
             else:
-                queryset =users
+                queryset = users
         else:
             queryset = users
         return queryset
 
-    permission_classes = (permissions.IsAuthenticated, )
+    permission_classes = (permissions.IsAuthenticated,)
+
     def get_permissions(self):
         if self.action == "retrieve":
             return [permissions.IsAuthenticated()]
@@ -276,68 +293,74 @@ class UserViewset(viewsets.ModelViewSet):
             return []
 
         return []
-    #重写create方法,给密码加密，并查询和创建token
+
+    # 重写create方法,给密码加密，并查询和创建token
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         passwd = request.data['password']
         user = self.perform_create(serializer)
-        #给密码加密
+        # 给密码加密
         user.set_password(passwd)
         user.save()
         re_dict = serializer.data
-        #查询和创建token
+        # 查询和创建token
         token = Token.objects.get_or_create(user=user)
 
         serializer = UserRegSerializer({'id': user.id, 'username': user.username, 'token': token[0]})
         serializer.data["status"] = HTTP_201_CREATED
-        #headers = self.get_success_headers(serializer.data)
+        # headers = self.get_success_headers(serializer.data)
         return Response(serializer.data)
-
 
     def perform_create(self, serializer):
         return serializer.save()
 
-class UserLoginViewset(mixins.CreateModelMixin,viewsets.GenericViewSet):
+
+class UserLoginViewset(mixins.CreateModelMixin, viewsets.GenericViewSet):
     """
      实现用户登录
      返回用户名、ID、token
     """
     serializer_class = UserLoginSerializer
-    #因登录只需post方法，可重写create方法，取消原有保存对象逻辑，加入登录逻辑
+
+    # 因登录只需post方法，可重写create方法，取消原有保存对象逻辑，加入登录逻辑
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data,
                                            context={'request': request})
-        if  serializer.is_valid(raise_exception=True):
+        if serializer.is_valid(raise_exception=True):
             user = serializer.validated_data['user']
-            #登录时，创建新的token
+            # 登录时，创建新的token
             tokenobj = Token.objects.update_or_create(user=user)
             token = Token.objects.get(user=user)
-            #重构返回数据
-            serializer = UserLoginSerializer({'username': user.username,'id':user.id,'password':'','token': token.key})
+            # 重构返回数据
+            serializer = UserLoginSerializer(
+                {'username': user.username, 'id': user.id, 'password': '', 'token': token.key})
             return Response(serializer.data, status=HTTP_200_OK)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
     def get_object(self):
         return self.request.user
 
-class UserSetPasswordViewset(mixins.CreateModelMixin,viewsets.GenericViewSet):
+
+class UserSetPasswordViewset(mixins.CreateModelMixin, viewsets.GenericViewSet):
     """
         实现用户修改密码
         输入username、password，验证正确返回password 修改成功，否则返回HTTP_400_BAD_REQUEST
     """
 
     serializer_class = UserSetPasswordSerializer
-    #设置对象集
+    # 设置对象集
     queryset = User.objects.all()
+
     # 因修改密码只需post方法，可重写create方法，取消原有保存对象逻辑，加入修改密码逻辑
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            #取出已验证的用户对象
+            # 取出已验证的用户对象
             instance = serializer.validated_data['user']
-            #设置加密密码
+            # 设置加密密码
             instance.set_password(request.data['newpassword'])
-            #保存
+            # 保存
             instance.save()
             return Response({'status': 'password 修改成功'})
         else:
@@ -346,7 +369,7 @@ class UserSetPasswordViewset(mixins.CreateModelMixin,viewsets.GenericViewSet):
 
 
 class UserFavViewset(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
-                             mixins.DestroyModelMixin, viewsets.GenericViewSet):
+                     mixins.DestroyModelMixin, viewsets.GenericViewSet):
     """
     list:
         获取用户收藏列表
@@ -355,17 +378,18 @@ class UserFavViewset(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.Retr
     create:
         收藏文章
     """
-    #permission_classes = (permissions.IsAuthenticated, )
-    #加入认证
+    # permission_classes = (permissions.IsAuthenticated, )
+    # 加入认证
     authentication_classes = (TokenAuthentication, SessionAuthentication)
     lookup_field = "articles_id"
     serializer_class = UserFavSerializer
-    #重写get_queryset
+
+    # 重写get_queryset
     def get_queryset(self):
         if self.request.user:
             queryset = UserFav.objects.filter(user=self.request.user)
         else:
-            queryset =[]
+            queryset = []
         return queryset
 
     # 重写create
@@ -375,24 +399,25 @@ class UserFavViewset(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.Retr
 
         articleid = request.data['articles']
         userid = request.data['user']
-        userfav = UserFav.objects.get_or_create(articles_id=articleid,user_id=userid)
+        userfav = UserFav.objects.get_or_create(articles_id=articleid, user_id=userid)
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=HTTP_201_CREATED, headers=headers)
 
 
-#通过apiview来实现登录功能
+# 通过apiview来实现登录功能
 class UserLogin(APIView):
     """
      实现用户登录
      输入username、password，验证正确返回用户名、ID、token 和HTTP_200_OK，否则返回HTTP_400_BAD_REQUEST
     """
     serializer_class = UserLoginSerializer
+
     def post(self, request, format=None):
         serializer = UserLoginSerializer(data=request.data)
-        if  serializer.is_valid(raise_exception=True):
+        if serializer.is_valid(raise_exception=True):
             user = serializer.validated_data['user']
-            #登录时，创建新的token
+            # 登录时，创建新的token
             tokenobj = Token.objects.update_or_create(user=user)
             token = Token.objects.get(user=user)
 
@@ -402,7 +427,8 @@ class UserLogin(APIView):
             return Response(serializer.data, status=HTTP_200_OK)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-#返回天天盈球的推荐数据
+
+# 返回天天盈球的推荐数据
 class TtYingQiu(viewsets.ModelViewSet):
     """
     返回天天盈球的推荐数据
@@ -411,13 +437,13 @@ class TtYingQiu(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
 
     def list(self, request, *args, **kwargs):
+        data = ttyingqiu()
+        data = data.rankings_list()
+        data = json.dumps(data)
+        # print(data)
 
-        data=ttyingqiu()
-        data=data.rankings_list()
-        data=json.dumps(data)
-        #print(data)
+        return Response(data, content_type="application/json", status=HTTP_200_OK)
 
-        return Response(data,content_type="application/json",status=HTTP_200_OK)
 
 class test(viewsets.ModelViewSet):
     """
@@ -427,10 +453,19 @@ class test(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
 
     def list(self, request, *args, **kwargs):
+        data = {"origin": "111.12.7.70, 111.193.7.70"}
+
+        return Response(json.dumps(data), content_type="application/json", status=HTTP_200_OK)
 
 
-        data={"origin": "111.12.7.70, 111.193.7.70"}
-
-
-
-        return Response(json.dumps(data),content_type="application/json",status=HTTP_200_OK)
+class getMatchListByDate(viewsets.ModelViewSet):
+    """
+    根据日期查询比赛数据列表
+    """
+    # 查询对象集
+    queryset = MatchList.objects.all()[:10]
+    # 序列化的类名
+    serializer_class = GetMatchListByDateSerializer
+    # 排序
+    ordering_fields = ('-matchId',)
+    lookup_field = "matchId"
