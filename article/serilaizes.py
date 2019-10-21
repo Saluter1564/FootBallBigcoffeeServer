@@ -11,7 +11,7 @@
 """
 from rest_framework import serializers
 from django.contrib.auth.models import User, Group
-from .models import Category, Item, Tag, Article, Ad, UserFav, MatchList
+from .models import Category, Item, Tag, Article, Ad, UserFav, MatchList_quanbu
 from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 from rest_framework.compat import authenticate
 
@@ -277,5 +277,5 @@ class UserFavSerializer(serializers.ModelSerializer):
 class GetMatchListByDateSerializer(serializers.ModelSerializer):
     # 根据日期获取比赛数据
     class Meta:
-        model = MatchList
+        model = MatchList_quanbu
         fields = "__all__"

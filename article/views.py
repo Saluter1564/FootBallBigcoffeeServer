@@ -1,5 +1,5 @@
 from rest_framework import viewsets
-from .models import Category, Item, Tag, Article, Ad, UserFav, User, MatchList
+from .models import Category, Item, Tag, Article, Ad, UserFav, User, MatchList_quanbu
 from .serilaizes import UserRegSerializer, UserDetailSerializer, UserLoginSerializer, UserSetPasswordSerializer
 from .serilaizes import UserFavSerializer, UserFavDetailSerializer, CategoryStringSerializer, \
     CategoryPrimaryKeySerializer, CategorySlugSerializer
@@ -463,7 +463,7 @@ class getMatchListByDate(viewsets.ModelViewSet):
     根据日期查询比赛数据列表
     """
     # 查询对象集
-    queryset = MatchList.objects.all()[:10]
+    queryset = MatchList_quanbu.objects.all()[:20]
     # 序列化的类名
     serializer_class = GetMatchListByDateSerializer
     # 排序

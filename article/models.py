@@ -8,6 +8,7 @@ from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 from django import utils
 
+
 class Category(models.Model):
     title = models.CharField(max_length=20, verbose_name='名称', help_text="大类")
 
@@ -100,9 +101,9 @@ class UserFav(models.Model):
         return self.user.username
 
 
-class MatchList(models.Model):
+class MatchList_quanbu(models.Model):
     """
-    比赛列表
+    比赛列表_全部
     """
     aicaiAwayId = models.IntegerField(blank=True, null=True, verbose_name='爱彩客队ID', help_text="爱彩客队ID")
     aicaiHomeId = models.IntegerField(blank=True, null=True, verbose_name='爱彩主队ID', help_text="爱彩主队ID")
@@ -129,6 +130,7 @@ class MatchList(models.Model):
     matchId = models.IntegerField(primary_key=True, verbose_name='比赛ID', help_text="比赛ID")
     matchTime = models.CharField(max_length=50, verbose_name='比赛开始时间', help_text="比赛开始时间")
     middle = models.BooleanField(default=False, verbose_name='是否中立场地', help_text="是否中立场地")
+    matchNoCn = models.CharField(max_length=50, blank=True, null=True, verbose_name='官方竞彩场次', help_text="官方竞彩场次")
     oddsAsia = models.CharField(max_length=50, verbose_name='亚盘赔率', help_text="亚盘赔率")
     oddsEurope = models.CharField(max_length=50, verbose_name='欧盘赔率', help_text="欧盘赔率")
     qtMatchId = models.IntegerField(verbose_name='qt比赛ID', help_text="qt比赛ID")
